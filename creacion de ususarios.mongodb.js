@@ -1,7 +1,12 @@
 // 5_usuarios_roles.mongodb.js
 use('bd_inventario_ventas');
 
-// 1. Creación de un Rol Personalizado (Solo lectura para reportes)
+// 0. LIMPIEZA PREVIA 
+db.dropAllUsers();
+db.dropAllRoles();
+
+// 1. CREACIÓN DE ROL PERSONALIZADO
+// Rol de solo lectura exclusivo para sacar reportes de ventas
 db.createRole({
     role: "reporteVentas",
     privileges: [
@@ -11,23 +16,37 @@ db.createRole({
     roles: []
 });
 
-// 2. Creación de Usuario Administrador (DBA)
+// 2. CREACIÓN DE USUARIOS DEL SISTEMA MONGODB
+
+// Usuario Administrador (Dueño de la base de datos)
+use('bd_inventario_ventas');
+
 db.createUser({
     user: "admin_inventario",
-    pwd: passwordPrompt(), // Pide la contraseña al ejecutar
-    roles: [ { role: "dbOwner", db: "bd_inventario_ventas" } ]
+    pwd: "AdminPassword2026", 
+    roles: [ 
+        { role: "dbOwner", db: "bd_inventario_ventas" } 
+    ]
 });
 
-// 3. Creación de Usuario para la Aplicación (Backend)
+// Usuario para la Aplicación (Backend - Permisos de Lectura y Escritura)
+use('bd_inventario_ventas');
+
 db.createUser({
     user: "app_ventas_backend",
-    pwd: "secureAppPassword2026",
-    roles: [ { role: "readWrite", db: "bd_inventario_ventas" } ]
+    pwd: "AppPassword2026",
+    roles: [ 
+        { role: "readWrite", db: "bd_inventario_ventas" } 
+    ]
 });
 
-// 4. Creación de Usuario de Solo Lectura (Auditoría/Reportes)
+// Usuario Auditor (Solo lectura usando el rol personalizado)
+use('bd_inventario_ventas');
+
 db.createUser({
     user: "auditor_ventas",
-    pwd: "auditorPassword2026",
-    roles: [ { role: "reporteVentas", db: "bd_inventario_ventas" } ]
+    pwd: "AuditorPassword2026",
+    roles: [ 
+        { role: "reporteVentas", db: "bd_inventario_ventas" } 
+    ]
 });

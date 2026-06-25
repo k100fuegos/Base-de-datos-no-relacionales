@@ -1,1 +1,3 @@
-mongodump --db bd_inventario_ventas --out ./backup_ventas
+cd 'C:\Program Files\MongoDB\Tools\100\bin\'
+
+.\mongodump --db bd_inventario_ventas --username admin_inventario --password AdminPassword2026 --authenticationDatabase bd_inventario_ventas --out ./backup_ventas

@@ -1,15 +1,15 @@
 // 1_creacion_db_esquemas.mongodb.js
 use('bd_inventario_ventas');
 
-// 1. Colección de Usuarios (con Roles embebidos)
+// 1. COLECCIÓN DE USUARIOS
 db.createCollection('usuarios', {
     validator: {
         $jsonSchema: {
             bsonType: 'object',
             required: ['nombre_usuario', 'correo_usuario', 'password_usuario', 'rol'],
             properties: {
-                nombre_usuario: { bsonType: 'string', description: 'Requerido y debe ser string' },
-                correo_usuario: { bsonType: 'string', pattern: "^.+@.+$", description: 'Debe ser un correo válido' },
+                nombre_usuario: { bsonType: 'string' },
+                correo_usuario: { bsonType: 'string', pattern: "^.+@.+$" },
                 password_usuario: { bsonType: 'string' },
                 estado_usuario: { bsonType: 'bool' },
                 rol: {
@@ -24,7 +24,7 @@ db.createCollection('usuarios', {
     }
 });
 
-// 2. Colección de Clientes
+// 2. COLECCIÓN DE CLIENTES
 db.createCollection('clientes', {
     validator: {
         $jsonSchema: {
@@ -41,7 +41,7 @@ db.createCollection('clientes', {
     }
 });
 
-// 3. Colección de Productos (con Categoría y Marca embebidas)
+// 3. COLECCIÓN DE PRODUCTOS
 db.createCollection('productos', {
     validator: {
         $jsonSchema: {
@@ -60,14 +60,16 @@ db.createCollection('productos', {
     }
 });
 
-// 4. Colección de Ventas (con Detalles embebidos)
+// 4. COLECCIÓN DE VENTAS
 db.createCollection('ventas', {
     validator: {
         $jsonSchema: {
             bsonType: 'object',
-            required: ['numero_factura', 'fecha_venta', 'subtotal_venta', 'iva_venta', 'total_venta', 'detalles'],
+            required: ['numero_factura', 'correo_usuario', 'dui_cliente', 'fecha_venta', 'subtotal_venta', 'iva_venta', 'total_venta', 'detalles'],
             properties: {
                 numero_factura: { bsonType: 'string' },
+                correo_usuario: { bsonType: 'string' },
+                dui_cliente: { bsonType: 'string' },
                 estado_venta: { enum: ['Realizada', 'Pendiente', 'Anulada'] },
                 subtotal_venta: { bsonType: 'double' },
                 iva_venta: { bsonType: 'double' },
@@ -77,8 +79,9 @@ db.createCollection('ventas', {
                     minItems: 1,
                     items: {
                         bsonType: 'object',
-                        required: ['id_producto', 'cantidad_producto', 'precio_unitario', 'subtotal_detalle'],
+                        required: ['codigo_producto', 'cantidad_producto', 'precio_unitario', 'subtotal_detalle'],
                         properties: {
+                            codigo_producto: { bsonType: 'string' },
                             cantidad_producto: { bsonType: 'int', minimum: 1 },
                             precio_unitario: { bsonType: 'double' },
                             subtotal_detalle: { bsonType: 'double' }
@@ -90,9 +93,5 @@ db.createCollection('ventas', {
     }
 });
 
-// Creación de Índices
-db.usuarios.createIndex({ correo_usuario: 1 }, { unique: true });
-db.clientes.createIndex({ dui_cliente: 1 }, { unique: true, sparse: true });
-db.productos.createIndex({ codigo_producto: 1 }, { unique: true });
+// 5. CREACIÓN DE ÍNDICE BÁSICO EN LA COLECCIÓN DE VENTAS
 db.ventas.createIndex({ numero_factura: 1 }, { unique: true });
-db.ventas.createIndex({ fecha_venta: -1 });

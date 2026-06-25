@@ -1,0 +1,1 @@
+mongodump --db bd_inventario_ventas --out ./backup_ventas
